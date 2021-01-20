@@ -1,0 +1,28 @@
+name: Rust
+
+on:
+  push:
+    branches: [ main ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: { image: ekidd/rust-musl-builder }
+    
+    steps:
+    - name: Setup permissions
+      run: sh -c "sudo chmod -R 777 /__w/telegram_bot/telegram_bot/ /github/home/"
+      
+    - uses: actions/checkout@v2
+      
+    - name: Compile static binaries
+      run: cargo build --verbose --release
+      
+    - uses: AButler/upload-release-assets@v2.0
+      with:
+        files: './target/release/telegram_bot'
+        release-tag: latest
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
